@@ -1,0 +1,43 @@
+#include <Arduino.h>
+
+// Define an array of LED pins and the button pin
+const int ledPins[] = {2, 4, 16, 17, 18, 19, 21, 22, 13, 27, 26, 25, 33, 32, 12}; // LED GPIO pins
+const int buttonPin = 0; // GPIO pin for the button
+const int numLEDs = sizeof(ledPins) / sizeof(ledPins[0]); // Number of LEDs
+
+int currentLED = 0; // Tracks the current LED
+bool lastButtonState = HIGH; // Last button state
+bool currentButtonState; // Current button state
+
+void setup() {
+  // Initialize each LED pin as an output
+  for (int i = 0; i < numLEDs; i++) {
+    pinMode(ledPins[i], OUTPUT);
+  }
+  
+  // Initialize the button pin as an input with an internal pull-up resistor
+  pinMode(buttonPin, INPUT_PULLUP);
+}
+
+void loop() {
+  // Read the current button state
+  currentButtonState = digitalRead(buttonPin);
+
+  // Check if the button was pressed (transition from HIGH to LOW)
+  if (currentButtonState == LOW && lastButtonState == HIGH) {
+    // Turn off the current LED
+    digitalWrite(ledPins[currentLED], LOW);
+
+    // Move to the next LED
+    currentLED = (currentLED + 1) % numLEDs; // Wrap around to the first LED after the last one
+
+    // Turn on the new current LED
+    digitalWrite(ledPins[currentLED], HIGH);
+    
+    // Debounce delay
+    delay(200);
+  }
+
+  // Update the last button state
+  lastButtonState = currentButtonState;
+}
