@@ -1,35 +1,74 @@
+#include <Arduino.h>
 //here we must define the pins for the button and board LED
-#define BUTTON_PIN   // GPIO pin for the push button
-#define BUILTIN_LED   // GPIO pin for the built-in LED
+#define BUTTON_PIN 0   // GPIO pin for the push button
+#define BUZZER 2  // GPIO pin for the built-in LED
 
 // GPIO pins for the external LEDs
 //This is an array that defines the LED pins
-const int ledPins[?] = {?,?}; 
+const int ledPins[14] = { 32, 22, 33, 21, 25, 19, 26, 18, 27, 17, 12, 16, 13, 4}; 
 
 //this is setting up variables for later use
-int currentDay = ;  // Tracks the current state
-bool lastButtonState = ;  // Tracks the last state of the button
-bool currentButtonState = ;  // Tracks the current state of the button
-unsigned long lastDebounceTime = 0;  // Last time the output pin was toggled
-unsigned long debounceDelay = 50;  // Debounce time in milliseconds
+int currentDay = 0;  // Tracks the current state
+bool lastButtonState = HIGH;  // Tracks the last state of the button
+bool currentButtonState;  // Tracks the current state of the button
+int numLEDs=14;
+int buzzDelay = 50;
 
+
+
+  void beepBuzzer(int i){
+    for(int j = 0; j < i; j++){
+    digitalWrite(BUZZER,HIGH);
+    delay(buzzDelay);
+    digitalWrite(BUZZER,LOW);
+    delay(buzzDelay);
+    }
+  }
 // this code sets up the LED's, button and buzzer.
 void setup() {
-  // Initialize serial communication for debugging
+
+  while(currentDay < 14){
+pinMode(ledPins[currentDay],OUTPUT);
+currentDay = currentDay + 1;
+  }
 
 
-  // This code loops through all 7 days and sets the external LED pins as outputs
+currentDay=0;
 
+pinMode(BUZZER,OUTPUT);
 
-  // Set the button and built-in LED pins
+pinMode(BUTTON_PIN,INPUT_PULLUP);
+
+digitalWrite(ledPins[currentDay],HIGH);
+
 
 }
 
 void loop() {
-// here we need to accomplish the following tasks: check if button is pressed, update the led, blink the main LED and later start the buzzer. 
+currentButtonState = digitalRead(BUTTON_PIN); 
+
+if(currentButtonState == LOW && lastButtonState == HIGH){
+//Change LED
+digitalWrite( ledPins[currentDay],LOW );
+
+currentDay = currentDay + 1;
+if(currentDay == 14){
+  currentDay = 0;
+}
+
+digitalWrite(ledPins[currentDay],HIGH);
+
+//Set off buzzer
+beepBuzzer(5);
+
+
+delay(200);
+}
+lastButtonState = currentButtonState;
+
   }
 
-// Function to blink the built-in LED to indicate the current state
-void blinkBuiltInLED(int times) {
-//here we must use a loop to blink the LED a certain number of times.
-}
+
+
+
+
